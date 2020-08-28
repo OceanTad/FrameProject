@@ -1,0 +1,102 @@
+static verifyProperties(Project project, String name) {
+    Properties properties = new Properties()
+    properties.load(project.file('gradle.properties').newDataInputStream())
+    def propertyValue = properties.getProperty('BUILD_INCLUDE')
+    if (propertyValue == null)
+        return false
+    return propertyValue.split(',').contains(name)
+}
+
+def module = verifyProperties(project.rootProject, 'launch').toBoolean()
+
+if (module)
+    apply plugin: 'com.android.library'
+else
+    apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion rootProject.ext.android.compileSdkVersion
+
+    defaultConfig {
+        if (!module) {
+            applicationId "com.lht.launch"
+            versionCode Integer.parseInt(VERSION_CODE)
+            versionName "${VERSION_NAME}"
+        }
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        consumerProguardFiles 'consumer-rules.pro'
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath true
+                arguments = [moduleName: "launch"]
+            }
+        }
+
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
+        }
+
+        ndk {
+            abiFilters "armeabi-v7a"
+        }
+
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            signingConfig signingConfigs.debug
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        release {
+            minifyEnabled true
+            if (!module)
+                shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            res.srcDirs = ['src/main/res']
+            jniLibs.srcDirs = ['libs']
+
+            if (module) {
+                manifest.srcFile 'src/main/library/AndroidManifest.xml'
+            } else {
+                manifest.srcFile 'src/main/application/AndroidManifest.xml'
+                java {
+                    exclude 'application/**'
+                }
+            }
+
+        }
+    }
+
+}
+
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+
+    annotationProcessor rootProject.ext.dependencies.arouter_compiler
+
+    implementation project(':base_library')
+}
+
+

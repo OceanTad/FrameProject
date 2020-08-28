@@ -1,0 +1,81 @@
+ext {
+    android = [
+            compileSdkVersion: 28,
+            minSdkVersion    : 19,
+            targetSdkVersion : 28,
+    ]
+
+    libsVersion = [
+
+            supportLibraryVersion = "27.1.1",
+            support_v4 = "27.1.1",
+
+            arouter_api = "1.4.1",
+            arouter_compiler = "1.0.3",
+
+            rxJava = "2.0.1",
+            rxAndroid = "2.0.1",
+            rxLife = "1.0.4",
+
+            retrofit = "2.2.0",
+            fastjson = "1.2.20",
+            converter_gson = "2.2.0",
+            okhttp = "3.8.1",
+            logging_interceptor = "3.8.1",
+            okio = "1.12.0",
+            adapter_rxjava = "2.3.0",
+
+            easy_permissions = "3.0.0",
+
+            glide = "glide:3.7.0",
+
+            round_image = "2.2.1",
+
+            refresh = "1.0.5.1",
+
+            auto_size = "1.2.1",
+
+    ]
+
+    dependencies = [
+
+            //android
+            appcompatV7        : "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion",
+            support_v4         : "com.android.support:support-v4:$rootProject.support_v4",
+            design             : "com.android.support:design:$rootProject.supportLibraryVersion",
+            cardview           : "com.android.support:cardview-v7:$rootProject.supportLibraryVersion",
+            recycleview        : "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion",
+
+            //ARouter
+            arouter_api        : "com.alibaba:arouter-api:$rootProject.arouter_api",
+            arouter_compiler   : "com.alibaba:arouter-compiler:$rootProject.arouter_compiler",
+
+            //RxJava
+            rxJava             : "io.reactivex.rxjava2:rxandroid:$rootProject.rxJava",
+            rxAndroid          : "io.reactivex.rxjava2:rxjava:$rootProject.rxAndroid",
+            rxLife             : "com.rxjava.rxlife:rxlife:$rootProject.rxLife",
+
+            easy_permissions   : "pub.devrel:easypermissions:$rootProject.easy_permissions",
+
+            //OkHttp
+            okhttp             : "com.squareup.okhttp3:okhttp:$rootProject.okhttp",
+            logging_interceptor: "com.squareup.okhttp3:logging-interceptor:$rootProject.logging_interceptor",
+            retrofit           : "com.squareup.retrofit2:retrofit:$rootProject.retrofit",
+            converter_gson     : "com.squareup.retrofit2:converter-gson:$rootProject.converter_gson",
+            adapter_rxjava     : "com.squareup.retrofit2:adapter-rxjava2:$rootProject.adapter_rxjava",
+            fastjson           : "com.alibaba:fastjson:$rootProject.fastjson",
+            okio               : "com.squareup.okio:okio:$rootProject.okio",
+
+            //glide
+            glide              : "com.github.bumptech.glide:$rootProject.glide",
+
+            //round-image
+            round_image_view   : "com.makeramen:roundedimageview:$rootProject.round_image",
+
+            refresh            : "com.scwang.smartrefresh:SmartRefreshLayout:$rootProject.refresh",
+
+            auto_size          : "me.jessyan:autosize:$rootProject.auto_size",
+
+    ]
+
+}

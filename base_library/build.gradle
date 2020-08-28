@@ -1,0 +1,98 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion rootProject.ext.android.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'consumer-rules.pro'
+
+        ndk {
+            abiFilters "armeabi-v7a"
+        }
+
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
+        }
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath true
+                arguments = [moduleName: "base"]
+            }
+        }
+
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            resValue("string", "server_envir", "${SERVER_ENVIR}")
+            resValue("string", "build_include", "${BUILD_INCLUDE}")
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        release {
+            minifyEnabled true
+            resValue("string", "server_envir", "${SERVER_ENVIR}")
+            resValue("string", "build_include", "${BUILD_INCLUDE}")
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            res.srcDirs = ['src/main/res']
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+
+}
+
+dependencies {
+    api fileTree(dir: 'libs', include: ['*.jar'])
+    api(rootProject.ext.dependencies.appcompatV7) {
+        exclude module: "support-annotations"
+        exclude module: "support-v4"
+    }
+    api(rootProject.ext.dependencies.support_v4) {
+        exclude module: "support-annotations"
+    }
+    api rootProject.ext.dependencies.design
+    api rootProject.ext.dependencies.recycleview
+    api rootProject.ext.dependencies.cardview
+    //rxJava
+    api(rootProject.ext.dependencies.rxJava) {
+        exclude module: "rxAndroid"
+    }
+    api rootProject.ext.dependencies.rxAndroid
+    //okhttp
+    api rootProject.ext.dependencies.fastjson
+    api rootProject.ext.dependencies.okio
+    api rootProject.ext.dependencies.retrofit
+    api rootProject.ext.dependencies.converter_gson
+    api rootProject.ext.dependencies.adapter_rxjava
+    api rootProject.ext.dependencies.okhttp
+    api rootProject.ext.dependencies.logging_interceptor
+    //glide
+    api rootProject.ext.dependencies.glide
+    //ARouter
+    api(rootProject.ext.dependencies.arouter_api) {
+        exclude group: 'com.android.support'
+    }
+    annotationProcessor rootProject.ext.dependencies.arouter_compiler
+    //round image
+    api rootProject.ext.dependencies.round_image_view
+    //banner
+    api rootProject.ext.dependencies.refresh
+
+    api rootProject.ext.dependencies.auto_size
+
+    api rootProject.ext.dependencies.rxLife
+
+    api rootProject.ext.dependencies.easy_permissions
+
+}

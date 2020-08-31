@@ -1,6 +1,7 @@
 package com.lht.frameproject;
 
 import android.Manifest;
+import android.content.Intent;
 import android.os.Environment;
 import android.view.View;
 import android.widget.TextView;
@@ -17,6 +18,7 @@ import com.lht.base_library.http.callback.ICallBack;
 import com.lht.base_library.http.download.DownLoadInfo;
 import com.lht.base_library.http.download.DownLoadListener;
 import com.lht.base_library.http.download.DownLoadManager;
+import com.lht.base_library.rxbus.RxBus;
 import com.lht.base_library.utils.AppConfigUtil;
 import com.lht.base_library.utils.LogUtil;
 import com.lht.base_library.utils.MD5Util;
@@ -25,6 +27,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
 
+import io.reactivex.functions.Consumer;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends BaseActivity<MainPresenterImp> {
@@ -32,7 +35,7 @@ public class MainActivity extends BaseActivity<MainPresenterImp> {
     @Override
     protected void loadView() {
         setContentView(R.layout.activity_main);
-        addViewClick(R.id.ceshi);
+        addViewClick(R.id.ceshi, R.id.ceshiyixia);
 //        showLoading();
         ForBackGroundManager.getInstance().registerForBackGroundReceiver(this, getClass(), new ForBackGroundListener() {
             @Override
@@ -60,11 +63,19 @@ public class MainActivity extends BaseActivity<MainPresenterImp> {
         }
 
         if (EasyPermissions.hasPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE})) {
-            downLoad();
+//            downLoad();
         } else {
             EasyPermissions.requestPermissions(this, "adafaf", 0, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE});
         }
 
+        LogUtil.e("aaaaa------"+RxBus.getInstance().hasRegister());
+        RxBus.getInstance().registerEvent(this, Lifecycle.Event.ON_DESTROY,String.class, new Consumer<String>() {
+            @Override
+            public void accept(String event) throws Exception {
+                LogUtil.e("main ceshi "+event.toString());
+            }
+        });
+        LogUtil.e("bbbbb------"+RxBus.getInstance().hasRegister());
     }
 
     private void request() {
@@ -167,6 +178,11 @@ public class MainActivity extends BaseActivity<MainPresenterImp> {
                 if (getPresenter() != null) {
                     getPresenter().ceshi();
                 }
+                startActivity(new Intent(this, SecondActivity.class));
+                break;
+            case R.id.ceshiyixia:
+                RxBus.getInstance().post("1000");
+                LogUtil.e("bbbbb------"+RxBus.getInstance().hasRegister());
                 break;
         }
     }

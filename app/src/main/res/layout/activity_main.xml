@@ -17,6 +17,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
+        android:id="@+id/ceshiyixia"
         android:layout_width="370dp"
         android:layout_height="20dp"
         android:src="#0ff"

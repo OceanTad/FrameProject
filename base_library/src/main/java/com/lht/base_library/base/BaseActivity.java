@@ -86,21 +86,25 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
         return null;
     }
 
-    public void addViewClick(int viewId) {
-        if (viewClickListener == null) {
-            viewClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onViewClick(v);
+    public void addViewClick(int... viewIds) {
+        if (viewIds != null && viewIds.length > 0) {
+            for (int viewId : viewIds) {
+                if (viewClickListener == null) {
+                    viewClickListener = new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onViewClick(v);
+                        }
+                    };
                 }
-            };
+                View view = mViews.get(viewId);
+                if (view == null) {
+                    view = findViewById(viewId);
+                    mViews.append(viewId, view);
+                }
+                view.setOnClickListener(viewClickListener);
+            }
         }
-        View view = mViews.get(viewId);
-        if (view == null) {
-            view = findViewById(viewId);
-            mViews.append(viewId, view);
-        }
-        view.setOnClickListener(viewClickListener);
     }
 
     private boolean isShow = false;

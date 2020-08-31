@@ -4,6 +4,7 @@ import android.util.ArrayMap;
 
 import com.lht.base_library.http.net.RetrofitManager;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 
 public class ApiHelp {
@@ -26,14 +27,19 @@ public class ApiHelp {
     }
 
     private Retrofit retrofit;
+    private OkHttpClient client;
     private ArrayMap<Class, Object> apiMap = new ArrayMap<>();
 
     protected void createApi(String baseUrl) {
-        retrofit = new RetrofitManager.Builder(baseUrl).builder().create();
+        RetrofitManager manager = new RetrofitManager.Builder(baseUrl).builder();
+        retrofit = manager.create();
+        client = manager.getClient();
     }
 
     protected void createApi(RetrofitManager.Builder builder) {
+        RetrofitManager manager = builder.builder();
         retrofit = builder.builder().create();
+        client = manager.getClient();
     }
 
     protected <T> T getApi(Class<T> object) {
@@ -43,6 +49,10 @@ public class ApiHelp {
         T obj = retrofit.create(object);
         apiMap.put(object, obj);
         return obj;
+    }
+
+    protected OkHttpClient getClient(){
+        return client;
     }
 
 }

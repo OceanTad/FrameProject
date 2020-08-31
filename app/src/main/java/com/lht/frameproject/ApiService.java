@@ -12,6 +12,6 @@ import retrofit2.http.QueryMap;
 public interface ApiService {
 
     @GET("/ref/account/phone/login")
-    Observable<BaseResponse<String>> login(@QueryMap Map<String, String> params);
+    Observable<BaseResponse<LoginInfoBean>> login(@QueryMap Map<String, String> params);
 
 }

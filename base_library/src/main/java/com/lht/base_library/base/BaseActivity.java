@@ -1,16 +1,23 @@
 package com.lht.base_library.base;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.SparseArray;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.lht.base_library.utils.DialogUtil;
 
-public abstract class BaseActivity<P extends BasePresenter> extends AppCompatActivity implements BaseView {
+import java.util.List;
+
+import pub.devrel.easypermissions.AppSettingsDialog;
+import pub.devrel.easypermissions.EasyPermissions;
+
+public abstract class BaseActivity<P extends BasePresenter> extends AppCompatActivity implements BaseView, EasyPermissions.PermissionCallbacks {
 
     private P presenter;
     private SparseArray<View> mViews = new SparseArray<>();
@@ -35,6 +42,32 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
         mViews.clear();
         mViews = null;
         super.onDestroy();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            new AppSettingsDialog.Builder(this).build().show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
+            resumeAppSetting();
+        }
     }
 
     public P getPresenter() {
@@ -106,5 +139,11 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     protected abstract void recycle();
 
     protected abstract P createPresenter();
+
+    protected void resumeAppSetting() {
+    }
+
+    protected void onResult(int requestCode, int resultCode, @Nullable Intent data) {
+    }
 
 }

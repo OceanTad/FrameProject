@@ -66,7 +66,7 @@ public class InterceptorFactory {
                         .url(httpUrl)
                         .addHeader("Accept", "application/json")
                         .addHeader("Content-Type", "application/json;charset=UTF-8");
-                if (params.length > 0) {
+                if (params != null && params.length > 0) {
                     if (params.length % 2 == 0) {
                         for (int i = 0; i < params.length / 2; i++) {
                             if (!TextUtils.isEmpty(params[2 * i]) && !TextUtils.isEmpty(params[2 * i + 1])) {

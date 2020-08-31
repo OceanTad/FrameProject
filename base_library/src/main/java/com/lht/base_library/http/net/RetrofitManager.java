@@ -33,6 +33,8 @@ public class RetrofitManager {
     private int readTimeOut;
     private int connectTimeOut;
 
+    private OkHttpClient client;
+
     private RetrofitManager(Builder builder) {
         this.baseUrl = builder.baseUrl;
         this.cache = builder.cache;
@@ -75,12 +77,22 @@ public class RetrofitManager {
     }
 
     public Retrofit create() {
+        if (client == null) {
+            client = buildClient();
+        }
         return new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(converterFactory)
-                .client(buildClient())
+                .client(client)
                 .build();
+    }
+
+    public OkHttpClient getClient() {
+        if (client == null) {
+            client = buildClient();
+        }
+        return client;
     }
 
     public OkHttpClient buildClient() {

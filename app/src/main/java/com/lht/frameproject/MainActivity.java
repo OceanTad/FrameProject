@@ -2,10 +2,10 @@ package com.lht.frameproject;
 
 import android.Manifest;
 import android.content.Intent;
-import android.os.Environment;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 
 import com.lht.base_library.base.BaseActivity;
@@ -13,30 +13,92 @@ import com.lht.base_library.broadcast.ForBackGroundListener;
 import com.lht.base_library.broadcast.ForBackGroundManager;
 import com.lht.base_library.broadcast.NetChangeManager;
 import com.lht.base_library.broadcast.NetChangeStateListener;
-import com.lht.base_library.http.api.ApiUtil;
-import com.lht.base_library.http.callback.ICallBack;
-import com.lht.base_library.http.download.DownLoadInfo;
-import com.lht.base_library.http.download.DownLoadListener;
-import com.lht.base_library.http.download.DownLoadManager;
 import com.lht.base_library.rxbus.RxBus;
-import com.lht.base_library.utils.AppConfigUtil;
 import com.lht.base_library.utils.LogUtil;
-import com.lht.base_library.utils.MD5Util;
+import com.rxjava.rxlife.RxLife;
 
-import java.io.File;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
 import pub.devrel.easypermissions.EasyPermissions;
+import pub.devrel.easypermissions.PermissionRequest;
 
-public class MainActivity extends BaseActivity<MainPresenterImp> {
+public class MainActivity extends BaseActivity<MainPresenterImp> implements MainContract.MainView {
 
     @Override
-    protected void loadView() {
-        setContentView(R.layout.activity_main);
+    protected void recycle() {
+        ForBackGroundManager.getInstance().unregisterForBackGroundReceiver(this, getClass());
+        NetChangeManager.getInstance().unregisterForBackGroundReceiver(this, getClass());
+    }
+
+    @Override
+    protected MainPresenterImp createPresenter() {
+        return new MainPresenterImp();
+    }
+
+    @Override
+    public void onViewClick(View view) {
+        super.onViewClick(view);
+        switch (view.getId()) {
+            case R.id.ceshi:
+                startActivity(new Intent(this, SecondActivity.class));
+                break;
+            case R.id.ceshiyixia:
+                RxBus.getInstance().post("1000");
+                break;
+        }
+    }
+
+    @Override
+    protected int loadView() {
+        return R.layout.activity_main;
+    }
+
+    @Override
+    protected void initView() {
+        super.initView();
+        findView(R.id.ceshi, TextView.class).setText("ce shi yi xia");
         addViewClick(R.id.ceshi, R.id.ceshiyixia);
-//        showLoading();
+        registerListener();
+        registerRxbus();
+//        countDown();
+    }
+
+    @Override
+    protected void loadData() {
+        super.loadData();
+        if (EasyPermissions.hasPermissions(this, Manifest.permission.READ_PHONE_STATE)) {
+            if (getPresenter() != null) {
+                getPresenter().login(this);
+            }
+        } else {
+            EasyPermissions.requestPermissions(this, "adafaf", 0, Manifest.permission.READ_PHONE_STATE);
+        }
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+        super.onPermissionsGranted(requestCode, perms);
+        if (requestCode == 0) {
+            if (getPresenter() != null) {
+                getPresenter().login(this);
+            }
+        } else if (requestCode == 1) {
+            if (getPresenter() != null) {
+                getPresenter().download();
+            }
+        }
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+        super.onPermissionsDenied(requestCode, perms);
+        LogUtil.e("quan xian ju jue");
+    }
+
+    private void registerListener() {
         ForBackGroundManager.getInstance().registerForBackGroundReceiver(this, getClass(), new ForBackGroundListener() {
             @Override
             public void onFroGround() {
@@ -55,136 +117,47 @@ public class MainActivity extends BaseActivity<MainPresenterImp> {
                 LogUtil.e("onNetStateChange:" + state);
             }
         });
+    }
 
-        if (EasyPermissions.hasPermissions(this, Manifest.permission.READ_PHONE_STATE)) {
-            request();
-        } else {
-            EasyPermissions.requestPermissions(this, "adafaf", 0, Manifest.permission.READ_PHONE_STATE);
-        }
-
-        if (EasyPermissions.hasPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE})) {
-//            downLoad();
-        } else {
-            EasyPermissions.requestPermissions(this, "adafaf", 0, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE});
-        }
-
-        LogUtil.e("aaaaa------"+RxBus.getInstance().hasRegister());
-        RxBus.getInstance().registerEvent(this, Lifecycle.Event.ON_DESTROY,String.class, new Consumer<String>() {
+    private void registerRxbus() {
+        RxBus.getInstance().registerEvent(this, Lifecycle.Event.ON_DESTROY, String.class, new Consumer<String>() {
             @Override
             public void accept(String event) throws Exception {
-                LogUtil.e("main ceshi "+event.toString());
-            }
-        });
-        LogUtil.e("bbbbb------"+RxBus.getInstance().hasRegister());
-    }
-
-    private void request() {
-        ApiUtil.initApi("http://vrdev.sitaitongxue.com");
-        ApiUtil.buildResult(ApiUtil.getApiService(ApiService.class).login(createLocalParams("phone", "13131287580", "code", "111111", "device_id", AppConfigUtil.getUuid(this))), this, Lifecycle.Event.ON_DESTROY, new ICallBack<LoginInfoBean>() {
-            @Override
-            public void onSuccess(LoginInfoBean s) {
-                LogUtil.e("****" + s);
-            }
-
-            @Override
-            public void onFailure(String str, int errorCode) {
-                LogUtil.e(errorCode + "****" + str);
-            }
-        });
-    }
-
-    private void downLoad() {
-        DownLoadInfo info = new DownLoadInfo("http://clips.vorwaerts-gmbh.de/", "big_buck_bunny.mp4", new DownLoadListener() {
-            @Override
-            public void onDownLoadStart(DownLoadInfo info) {
-                LogUtil.e("onDownLoadStart:" + info);
-            }
-
-            @Override
-            public void onDownLoadProgress(DownLoadInfo info, int progress) {
-                LogUtil.e("onDownLoadProgress:" + info + "*****" + progress);
-            }
-
-            @Override
-            public void onDownLoadFinish(DownLoadInfo info) {
-                LogUtil.e("onDownLoadFinish:" + info);
-            }
-
-            @Override
-            public void onDownLoadFail(DownLoadInfo info, Throwable throwable) {
-                LogUtil.e("onDownLoadFail:" + info + "******" + throwable.getClass() + "***" + throwable.getMessage());
-            }
-
-            @Override
-            public <T> void onNext(DownLoadInfo info, T t) {
-                LogUtil.e("onNext:" + info + "*****" + t);
-            }
-
-            @Override
-            public void onDownLoadPause(DownLoadInfo info) {
-                LogUtil.e("onDownLoadPause:" + info);
-            }
-
-            @Override
-            public void onDownLoadStop(DownLoadInfo info) {
-                LogUtil.e("onDownLoadStop:" + info);
-            }
-        });
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "test1.mp4");
-        info.setSavePath(file.getAbsolutePath());
-        DownLoadManager.getInstance().startTask(info);
-    }
-
-    private Map<String, String> createLocalParams(String... args) {
-
-        TreeMap<String, String> paramsMap = new TreeMap<>();
-        paramsMap.put("appkey", "de158f35d459f481f0ba9309a309162c");
-        paramsMap.put("channel", "5001001015");
-        paramsMap.put("version", AppConfigUtil.getApkVersionName(this));
-
-        for (int i = 0; i < args.length; i++) {
-            paramsMap.put(args[i], args[++i]);
-        }
-
-        StringBuffer sb = new StringBuffer();
-        for (Map.Entry<String, String> entry : paramsMap.entrySet()) {
-            sb.append(entry.getKey())
-                    .append('=')
-                    .append(entry.getValue());
-        }
-        sb.append('_').append("a0b5224d564feecdf2b5019d1c836964");
-        paramsMap.put("sign", MD5Util.getMD5String(sb.toString()));
-
-        return paramsMap;
-    }
-
-    @Override
-    protected void recycle() {
-        ForBackGroundManager.getInstance().unregisterForBackGroundReceiver(this, getClass());
-        NetChangeManager.getInstance().unregisterForBackGroundReceiver(this, getClass());
-    }
-
-    @Override
-    protected MainPresenterImp createPresenter() {
-        return new MainPresenterImp();
-    }
-
-    @Override
-    protected void onViewClick(View view) {
-        super.onViewClick(view);
-        switch (view.getId()) {
-            case R.id.ceshi:
-                findView(R.id.ceshi, TextView.class).setText("nihao ceshi fengzhuang");
-                if (getPresenter() != null) {
-                    getPresenter().ceshi();
+                if (EasyPermissions.hasPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE})) {
+                    if (getPresenter() != null) {
+                        getPresenter().download();
+                    }
+                } else {
+                    EasyPermissions.requestPermissions(new PermissionRequest.Builder(MainActivity.this, 1, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE})
+                            .setRationale("需要权限")
+                            .setPositiveButtonText("确定")
+                            .setNegativeButtonText("取消")
+                            .setTheme(R.style.Theme_AppCompat_Dialog)
+                            .build());
                 }
-                startActivity(new Intent(this, SecondActivity.class));
-                break;
-            case R.id.ceshiyixia:
-                RxBus.getInstance().post("1000");
-                LogUtil.e("bbbbb------"+RxBus.getInstance().hasRegister());
-                break;
-        }
+            }
+        });
+    }
+
+    private void countDown() {
+        Observable.intervalRange(0, 60, 0, 1000, TimeUnit.MILLISECONDS)
+                .lift(RxLife.lift(this, Lifecycle.Event.ON_DESTROY))
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        LogUtil.e("倒计时------" + aLong);
+                    }
+                });
+    }
+
+    @Override
+    public void onSuccess() {
+        LogUtil.e("main onSuccess");
+    }
+
+    @Override
+    public void onFail() {
+        LogUtil.e("main onFail");
     }
 
 }

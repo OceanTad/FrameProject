@@ -2,7 +2,6 @@ package com.lht.base_library.base;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.SparseArray;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -20,8 +19,8 @@ import pub.devrel.easypermissions.EasyPermissions;
 public abstract class BaseActivity<P extends BasePresenter> extends AppCompatActivity implements BaseView, EasyPermissions.PermissionCallbacks {
 
     private P presenter;
-    private SparseArray<View> mViews = new SparseArray<>();
-    private View.OnClickListener viewClickListener;
+    private BaseViewHolder viewHolder;
+    private View.OnClickListener onClickListener;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -32,15 +31,17 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
             presenter.attachView(this);
             getLifecycle().addObserver(presenter);
         }
-        loadView();
+        setContentView(loadView());
+        viewHolder = new BaseViewHolder(getWindow().getDecorView());
+        getLifecycle().addObserver(viewHolder);
+        initView();
+        loadData();
     }
 
     @Override
     protected void onDestroy() {
         recycle();
         dismissLoading();
-        mViews.clear();
-        mViews = null;
         super.onDestroy();
     }
 
@@ -67,6 +68,8 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
             resumeAppSetting();
+        } else {
+            onResult(requestCode, resultCode, data);
         }
     }
 
@@ -74,35 +77,30 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
         return presenter;
     }
 
-    public <T> T findView(int viewId, Class<T> classType) {
-        View view = mViews.get(viewId);
-        if (view == null) {
-            view = findViewById(viewId);
-            mViews.append(viewId, view);
-        }
-        if (classType.isInstance(view)) {
-            return classType.cast(view);
+    public <T extends View> T findView(int viewId, Class<T> classType) {
+        if (viewHolder != null) {
+            return viewHolder.findView(viewId, classType);
         }
         return null;
     }
 
     public void addViewClick(int... viewIds) {
+        if (onClickListener == null) {
+            onClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onViewClick(v);
+                }
+            };
+        }
         if (viewIds != null && viewIds.length > 0) {
             for (int viewId : viewIds) {
-                if (viewClickListener == null) {
-                    viewClickListener = new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            onViewClick(v);
-                        }
-                    };
+                if (viewHolder != null) {
+                    View view = viewHolder.findView(viewId);
+                    if (view != null) {
+                        view.setOnClickListener(onClickListener);
+                    }
                 }
-                View view = mViews.get(viewId);
-                if (view == null) {
-                    view = findViewById(viewId);
-                    mViews.append(viewId, view);
-                }
-                view.setOnClickListener(viewClickListener);
             }
         }
     }
@@ -138,7 +136,13 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     protected void onViewClick(View view) {
     }
 
-    protected abstract void loadView();
+    protected abstract int loadView();
+
+    protected void initView() {
+    }
+
+    protected void loadData() {
+    }
 
     protected abstract void recycle();
 

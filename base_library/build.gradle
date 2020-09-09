@@ -90,6 +90,7 @@ dependencies {
     api rootProject.ext.dependencies.refresh
 
     api rootProject.ext.dependencies.auto_size
+    api rootProject.ext.dependencies.immersion_bar
 
     api rootProject.ext.dependencies.rxLife
 

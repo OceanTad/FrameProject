@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.lht.base_library" >
+    package="com.lht.base_library">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -10,13 +10,40 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <application>
+    <uses-permission android:name="com.lht.base_binder.permission.ACCESS_BINDER_POOL" />
+
+    <permission android:name="com.lht.base_binder.permission.ACCESS_BINDER_POOL" />
+
+    <application
+        android:resizeableActivity="true"
+        android:maxAspectRatio="2.4">
+
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="2.4" />
+        <!--适配华为（huawei）刘海屏-->
+        <meta-data
+            android:name="android.notch_support"
+            android:value="true"/>
+        <!--适配小米（xiaomi）刘海屏-->
+        <meta-data
+            android:name="notch.config"
+            android:value="portrait|landscape" />
+
         <meta-data
             android:name="design_width_in_dp"
-            android:value="375"/>
+            android:value="375" />
         <meta-data
             android:name="design_height_in_dp"
-            android:value="667"/>
+            android:value="667" />
+
+        <service android:name=".binder.BinderPoolService" />
+
+        <activity
+            android:name=".webview.CustomWebActivity"
+            android:hardwareAccelerated="true"
+            android:process=":other" />
+
     </application>
 
 </manifest>

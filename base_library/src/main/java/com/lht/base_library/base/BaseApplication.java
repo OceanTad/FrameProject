@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.MessageQueue;
 import android.text.TextUtils;
+import android.webkit.WebView;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.lht.base_library.R;
@@ -33,6 +35,9 @@ public class BaseApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        
+        initWebView();
+        
         if (isMainProcess()) {
 
             instance = this;
@@ -44,6 +49,15 @@ public class BaseApplication extends Application {
             init();
             delayInit();
 
+        }
+    }
+
+    private void initWebView(){
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.P) {
+            String processName = getProcessName();
+            if(getApplicationContext().getPackageName().equals(processName)) {
+                WebView.setDataDirectorySuffix(processName);
+            }
         }
     }
 

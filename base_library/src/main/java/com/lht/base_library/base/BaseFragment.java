@@ -62,7 +62,7 @@ public abstract class BaseFragment<P extends BasePresenter> extends Fragment imp
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (viewHolder == null) {
-            viewHolder = new BaseViewHolder(inflater.inflate(loadView(), container));
+            viewHolder = new BaseViewHolder(inflater.inflate(loadView(), null));
         }
         if (viewHolder.getRootView() != null && viewHolder.getRootView().getParent() != null) {
             ((ViewGroup) viewHolder.getRootView().getParent()).removeView(viewHolder.getRootView());

@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 
+import com.gyf.immersionbar.ImmersionBar;
 import com.lht.base_library.base.BaseActivity;
 import com.lht.base_library.broadcast.ForBackGroundListener;
 import com.lht.base_library.broadcast.ForBackGroundManager;
@@ -59,6 +60,7 @@ public class MainActivity extends BaseActivity<MainPresenterImp> implements Main
     @Override
     protected void initView() {
         super.initView();
+        ImmersionBar.with(this).titleBar(R.id.bar).init();
         findView(R.id.ceshi, TextView.class).setText("ce shi yi xia");
         addViewClick(R.id.ceshi, R.id.ceshiyixia);
         registerListener();

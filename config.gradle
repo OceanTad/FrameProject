@@ -35,6 +35,8 @@ ext {
 
             auto_size = "1.2.1",
 
+            immersion_bar = "3.0.0",
+
     ]
 
     dependencies = [
@@ -75,6 +77,7 @@ ext {
             refresh            : "com.scwang.smartrefresh:SmartRefreshLayout:$rootProject.refresh",
 
             auto_size          : "me.jessyan:autosize:$rootProject.auto_size",
+            immersion_bar      : "com.gyf.immersionbar:immersionbar:$rootProject.immersion_bar",
 
     ]
 

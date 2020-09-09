@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0">
+    <meta name="format-detection" content="telephone=yes"/>
+    <title>网络异常</title>
+    <style type="text/css">
+      html, body { width: 100%; height: 100%; margin: 0; padding: 0 }
+      .wrapper { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; flex-direction: column }
+      img { width: 169px; height: 174px; }
+      span { margin-top: 4px; color: #9B9B9B; font-size: 14px; }
+      .reload { margin-top: 40px; width: 116px; height: 32px; line-height: 32px; text-align: center; color: #2A52BE; font-size: 13px; border-radius:3px; border:1px solid rgba(42,82,190,1); }
+
+
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <img src="./error.png">
+    <span>哎呀，界面走丢了～</span>
+    <div class="reload" onclick="reload()">重新加载</div>
+</div>
+<script type="text/javascript">
+      function reload() {
+        console.log('重载页面')
+        window.jsCallAndroid.post('retryLoad')
+      }
+      function androidCallJs(url){
+        window.location.replace(url)
+      }
+
+</script>
+</body>
+</html>

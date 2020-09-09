@@ -138,6 +138,16 @@ public abstract class BaseFragment<P extends BasePresenter> extends Fragment imp
                 }
             };
         }
+		 if (viewIds != null && viewIds.length > 0) {
+            for (int viewId : viewIds) {
+                if (viewHolder != null) {
+                    View view = viewHolder.findView(viewId);
+                    if (view != null) {
+                        view.setOnClickListener(onClickListener);
+                    }
+                }
+            }
+        }
     }
 
     protected void onViewClick(View view) {

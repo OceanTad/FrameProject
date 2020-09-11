@@ -26,12 +26,12 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ARouter.getInstance().inject(this);
+		setContentView(loadView());
         presenter = createPresenter();
         if (presenter != null) {
             presenter.attachView(this);
             getLifecycle().addObserver(presenter);
         }
-        setContentView(loadView());
         viewHolder = new BaseViewHolder(getWindow().getDecorView());
         getLifecycle().addObserver(viewHolder);
         initView();

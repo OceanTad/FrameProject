@@ -93,8 +93,7 @@ public class CustomWebViewClient extends WebViewClient {
                 return true;
             }
         }
-        view.loadUrl(url);
-        return true;
+        return false;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)

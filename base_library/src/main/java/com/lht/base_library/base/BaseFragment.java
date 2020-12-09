@@ -1,6 +1,8 @@
 package com.lht.base_library.base;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,13 +11,19 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LifecycleOwner;
+
+import com.gyf.immersionbar.components.SimpleImmersionOwner;
+import com.gyf.immersionbar.components.SimpleImmersionProxy;
 
 import java.util.List;
 
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public abstract class BaseFragment<P extends BasePresenter> extends Fragment implements BaseView, EasyPermissions.PermissionCallbacks {
+public abstract class BaseFragment<P extends BasePresenter> extends Fragment implements BaseView, EasyPermissions.PermissionCallbacks, SimpleImmersionOwner {
+
+    private SimpleImmersionProxy mImmersion;
 
     private BaseViewHolder viewHolder;
     private View.OnClickListener onClickListener;
@@ -28,6 +36,12 @@ public abstract class BaseFragment<P extends BasePresenter> extends Fragment imp
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
+        if (immersionBarEnabled()) {
+            if (mImmersion == null) {
+                mImmersion = new SimpleImmersionProxy(this);
+            }
+            mImmersion.setUserVisibleHint(isVisibleToUser);
+        }
         if (isVisibleToUser) {
             isVisible = true;
             if (isPrepared) {
@@ -45,6 +59,17 @@ public abstract class BaseFragment<P extends BasePresenter> extends Fragment imp
         super.onCreate(savedInstanceState);
         isPrepared = false;
         isVisible = false;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (immersionBarEnabled()) {
+            if (mImmersion == null) {
+                mImmersion = new SimpleImmersionProxy(this);
+            }
+            mImmersion.onActivityCreated(savedInstanceState);
+        }
     }
 
     @Override
@@ -74,6 +99,51 @@ public abstract class BaseFragment<P extends BasePresenter> extends Fragment imp
         }
         initView();
         return viewHolder.getRootView();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        isPrepared = false;
+        if (mImmersion != null) {
+            mImmersion.onDestroy();
+        }
+        recycle();
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (immersionBarEnabled()) {
+            if (mImmersion == null) {
+                mImmersion = new SimpleImmersionProxy(this);
+            }
+            mImmersion.onHiddenChanged(hidden);
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (immersionBarEnabled()) {
+            if (mImmersion == null) {
+                mImmersion = new SimpleImmersionProxy(this);
+            }
+            mImmersion.onConfigurationChanged(newConfig);
+        }
+    }
+
+    @Override
+    public Context getCurrentContext() {
+        if (getActivity() != null && getActivity() instanceof BaseActivity) {
+            return ((BaseActivity) getActivity()).getCurrentContext();
+        }
+        return null;
+    }
+
+    @Override
+    public LifecycleOwner getLifecycleOwner() {
+        return getViewLifecycleOwner();
     }
 
     @Override
@@ -108,7 +178,14 @@ public abstract class BaseFragment<P extends BasePresenter> extends Fragment imp
     @Override
     public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
         if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
-            new AppSettingsDialog.Builder(this).build().show();
+            new AppSettingsDialog
+                    .Builder(this)
+                    .setTitle("提示")
+                    .setRationale("应用需要此权限，否则无法正常使用，是否打开设置")
+                    .setPositiveButton("是")
+                    .setNegativeButton("否")
+                    .build()
+                    .show();
         }
     }
 
@@ -120,6 +197,16 @@ public abstract class BaseFragment<P extends BasePresenter> extends Fragment imp
         } else {
             onResult(requestCode, resultCode, data);
         }
+    }
+
+    @Override
+    public void initImmersionBar() {
+
+    }
+
+    @Override
+    public boolean immersionBarEnabled() {
+        return false;
     }
 
     public <T extends View> T findView(int viewId, Class<T> classType) {

@@ -20,10 +20,10 @@ public class WebViewLifeCycle implements LifecycleObserver {
         this.webView = new SoftReference<>(webView);
     }
 
-    public void init(){
-        if(webView!=null&&webView.get()!=null) {
+    public void init() {
+        if (webView != null && webView.get() != null) {
             WebSettings webSettings = webView.get().getSettings();
-            if(webSettings!=null) {
+            if (webSettings != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
                 }
@@ -55,8 +55,8 @@ public class WebViewLifeCycle implements LifecycleObserver {
                 }
             }
             webView.get().setSaveEnabled(false);
-            if (webView.get().isHardwareAccelerated()){
-                webView.get().setLayerType(View.LAYER_TYPE_HARDWARE,null);
+            if (webView.get().isHardwareAccelerated()) {
+                webView.get().setLayerType(View.LAYER_TYPE_HARDWARE, null);
             }
         }
     }

@@ -3,5 +3,6 @@
 
     <string name="wx_uninstall">请安装微信后再完成支付</string>
     <string name="alipay_uninstall">请安装支付宝后再完成支付</string>
+    <string name="no_data">暂无数据</string>
 
 </resources>

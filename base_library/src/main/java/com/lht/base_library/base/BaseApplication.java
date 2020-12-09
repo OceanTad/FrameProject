@@ -49,6 +49,8 @@ public class BaseApplication extends Application {
             init();
             delayInit();
 
+            CrashHandler.getInstance().init(this);
+
         }
     }
 

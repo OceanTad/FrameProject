@@ -35,33 +35,38 @@ public class BaseViewHolder implements LifecycleObserver {
     }
 
     public <T extends View> T findView(int viewId, Class<T> classType) {
-        View view = mViews.get(viewId);
-        if (view == null) {
-            if (rootView != null && rootView.get() != null) {
-                view = rootView.get().findViewById(viewId);
+        if (mViews != null) {
+            View view = mViews.get(viewId);
+            if (view == null) {
+                if (rootView != null && rootView.get() != null) {
+                    view = rootView.get().findViewById(viewId);
+                }
+                if (view != null) {
+                    mViews.append(viewId, view);
+                }
             }
-            if (view != null) {
-                mViews.append(viewId, view);
+            if (classType.isInstance(view)) {
+                return classType.cast(view);
             }
-        }
-        if (classType.isInstance(view)) {
-            return classType.cast(view);
         }
         return null;
     }
 
     public View findView(int viewId) {
-        View view = mViews.get(viewId);
-        if (view == null) {
-            if (rootView != null && rootView.get() != null) {
-                view = rootView.get().findViewById(viewId);
-            }
-            if (view != null) {
-                mViews.append(viewId, view);
+        if (mViews != null) {
+            View view = mViews.get(viewId);
+            if (view == null) {
+                if (rootView != null && rootView.get() != null) {
+                    view = rootView.get().findViewById(viewId);
+                }
+                if (view != null) {
+                    mViews.append(viewId, view);
+                }
+                return view;
             }
             return view;
         }
-        return view;
+        return null;
     }
 
 }

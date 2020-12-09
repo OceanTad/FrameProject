@@ -36,6 +36,7 @@ ext {
             auto_size = "1.2.1",
 
             immersion_bar = "3.0.0",
+            immersion_bar_fragment = "3.0.0",
 
     ]
 
@@ -78,6 +79,7 @@ ext {
 
             auto_size          : "me.jessyan:autosize:$rootProject.auto_size",
             immersion_bar      : "com.gyf.immersionbar:immersionbar:$rootProject.immersion_bar",
+            immersion_bar_fragment: "com.gyf.immersionbar:immersionbar-components:$rootProject.immersion_bar_fragment",
 
     ]
 

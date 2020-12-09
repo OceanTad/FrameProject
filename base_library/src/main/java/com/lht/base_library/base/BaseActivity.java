@@ -1,5 +1,6 @@
 package com.lht.base_library.base;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -7,6 +8,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LifecycleOwner;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.lht.base_library.utils.DialogUtil;
@@ -59,7 +61,14 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     @Override
     public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
         if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
-            new AppSettingsDialog.Builder(this).build().show();
+            new AppSettingsDialog
+                    .Builder(this)
+                    .setTitle("提示")
+                    .setRationale("应用需要此权限，否则无法正常使用，是否打开设置")
+                    .setPositiveButton("是")
+                    .setNegativeButton("否")
+                    .build()
+                    .show();
         }
     }
 
@@ -103,6 +112,16 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
                 }
             }
         }
+    }
+
+    @Override
+    public Context getCurrentContext() {
+        return this;
+    }
+
+    @Override
+    public LifecycleOwner getLifecycleOwner() {
+        return this;
     }
 
     private boolean isShow = false;

@@ -32,10 +32,10 @@ public abstract class BasePresenter<V extends BaseView> implements LifecycleObse
         return null;
     }
 
-    private void init() {
+    protected void init() {
     }
 
-    private void destroy() {
+    protected void destroy() {
     }
 
 }
